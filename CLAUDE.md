@@ -14,16 +14,16 @@ A **gap** is anything `gb` gets wrong or can't show while we use it: a crash, wr
 
 1. File it: `gh issue create --label gap` with the command run, the project, expected vs actual output, and any bytes or offsets involved.
 2. If the fix needs ground truth from the user in GarageBand (changing knobs and saving a copy), add the `needs-ground-truth` label, tell the user what session it needs, and stop there.
-3. Otherwise start a background Agent with `isolation: "worktree"`, giving it the issue number and this brief: read the issue and `docs/format.md`; fix on branch `fix/<issue>-<slug>`; `gh pr create` with `Closes #<issue>` in the body; work through the ready-to-merge checklist below; report the PR URL and the checklist outcome.
-4. When the agent reports, confirm each checklist item was met, then merge and post the PR link to the user.
+3. Otherwise start a background Agent with `isolation: "worktree"`, giving it the issue number and this brief: read the issue and `docs/format.md`; fix on branch `fix/<issue>-<slug>`; push and `gh pr create` with `Closes #<issue>` in the body; work through the ready checklist below, pushing after every fix; report the PR URL and the checklist outcome.
+4. When the agent reports, merge per the ready checklist.
 
 ## Ready to merge
 
-A PR is **ready** when every item holds, in this order, for every PR including the gap loop's:
+A PR is **ready** when every item holds, checked in this order, for every PR including the gap loop's:
 
-1. The full test suite passes.
-2. Every added or changed test was written with `skill-utils:test-writing`.
-3. Changed output was checked against real projects; for new `ProjectData` decoding, against GarageBand itself where possible.
-4. `/code-review` has run on the PR, and each finding is fixed or answered on the PR with the reason it stands. Re-run after fixes until a review reports no new findings; after any fix, re-check items 1 to 3.
+1. The full test suite passes on the PR branch as pushed.
+2. The PR description carries the `skill-utils:test-writing` verdict line for every added or changed test.
+3. Changed output was checked against real projects. New `ProjectData` decoding is confirmed against ground truth the user supplied (a screenshot, a diff session); if it needs fresh ground truth, label the issue `needs-ground-truth` instead of merging. Never open or drive GarageBand yourself: it can autosave the user's projects.
+4. `/code-review` has run on the PR. Fix each finding, or answer it on the PR with the reason it stands, push, and re-run. Stop when a run raises nothing you would fix, or after 3 rounds; at the cap, answer what remains on the PR and tell the user.
 
-Then squash-merge without asking (the user has authorised this) and post the PR link to the user.
+Before merging, whoever merges runs the test suite on the PR branch themselves; a report alone is not enough. Then squash-merge (`gh pr merge --squash --delete-branch`) without asking, as the user has authorised, and post the PR link to the user.
