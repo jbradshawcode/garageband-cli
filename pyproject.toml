@@ -20,3 +20,5 @@ target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
+# ruff format owns line length; long strings it cannot wrap are allowed.
+ignore = ["E501"]

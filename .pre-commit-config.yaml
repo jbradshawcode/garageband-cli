@@ -18,11 +18,15 @@ repos:
       - id: check-added-large-files
         args: [--maxkb=500]
         exclude: ^tests/fixtures/
+      - id: check-added-large-files
+        name: check for large test fixtures
+        args: [--maxkb=2000]
+        files: ^tests/fixtures/
   - repo: local
     hooks:
       - id: no-projects-or-audio
         name: no GarageBand projects or audio outside tests/fixtures/
         entry: GarageBand projects and audio stay out of the repo; test projects go under tests/fixtures/
         language: fail
-        files: '(\.band/|\.(aif|aiff|wav|mp3|m4a|caf)$)'
+        files: '(?i)(\.band/|\.(aif|aiff|aifc|wav|mp3|m4a|m4r|mp4|aac|caf|flac|ogg)$)'
         exclude: ^tests/fixtures/

@@ -3,3 +3,17 @@ __pycache__/
 .venv/
 build/
 dist/
+
+# GarageBand projects and audio stay out of the repo (also enforced by pre-commit).
+*.band/
+*.aif
+*.aiff
+*.aifc
+*.wav
+*.mp3
+*.m4a
+*.m4r
+*.aac
+*.caf
+*.flac
+!tests/fixtures/**
