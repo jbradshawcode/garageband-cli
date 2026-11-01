@@ -17,17 +17,24 @@ class ProjectError(Exception):
 
 
 def _read_bytes(path: Path) -> bytes:
-    with open(path, "rb") as f:
-        return f.read()
+    try:
+        with open(path, "rb") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise ProjectError(f"missing {path.name} in project") from None
+    except OSError as e:
+        raise ProjectError(f"cannot read {path.name}: {e.strerror or e}") from None
 
 
 def _read_plist(path: Path) -> dict[str, Any]:
+    data = _read_bytes(path)
     try:
-        return plistlib.loads(_read_bytes(path))
-    except FileNotFoundError:
-        raise ProjectError(f"missing {path.name} in project") from None
-    except plistlib.InvalidFileException as e:
+        plist = plistlib.loads(data)
+    except Exception as e:  # plistlib raises several unrelated types on bad input
         raise ProjectError(f"unreadable {path.name}: {e}") from None
+    if not isinstance(plist, dict):
+        raise ProjectError(f"unreadable {path.name}: not a dictionary")
+    return plist
 
 
 @dataclass(frozen=True)
@@ -38,7 +45,11 @@ class Project:
     @classmethod
     def open(cls, path: str | Path, alternative: int = 0) -> "Project":
         p = Path(path).expanduser().resolve()
-        if not (p / "Alternatives").is_dir():
+        try:
+            is_project = (p / "Alternatives").is_dir()
+        except OSError as e:
+            raise ProjectError(f"cannot read {p}: {e.strerror or e}") from None
+        if not is_project:
             raise ProjectError(f"not a GarageBand project: {p}")
         project = cls(p, alternative)
         if not project.alternative_dir.is_dir():
@@ -53,10 +64,14 @@ class Project:
         return self.path / "Alternatives" / f"{self.alternative:03d}"
 
     def alternatives(self) -> list[int]:
+        try:
+            entries = list((self.path / "Alternatives").iterdir())
+        except OSError as e:
+            raise ProjectError(f"cannot read Alternatives: {e.strerror or e}") from None
         return sorted(
             int(d.name)
-            for d in (self.path / "Alternatives").iterdir()
-            if d.is_dir() and d.name.isdigit()
+            for d in entries
+            if d.name.isascii() and d.name.isdigit() and d.is_dir()
         )
 
     def project_information(self) -> dict[str, Any]:

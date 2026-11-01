@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import sys
 from typing import Any, Callable
 
@@ -11,12 +12,16 @@ from .project import Project, ProjectError, info
 from .tracks import tracks
 
 
+def _num(v: Any) -> str:
+    return f"{v:g}" if isinstance(v, (int, float)) else str(v)
+
+
 def _print_info(d: dict[str, Any]) -> None:
     rows = [
         ("Name", d["name"]),
         ("Path", d["path"]),
         ("Saved with", d["saved_with"]),
-        ("Tempo", f"{d['tempo_bpm']:g} BPM" if d["tempo_bpm"] is not None else None),
+        ("Tempo", f"{_num(d['tempo_bpm'])} BPM" if d["tempo_bpm"] is not None else None),
         ("Time signature", d["time_signature"]),
         ("Key", d["key"]),
         ("Sample rate", f"{d['sample_rate']} Hz" if d["sample_rate"] else None),
@@ -64,6 +69,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Die quietly when the reader goes away (e.g. `gb ... | head`), like other CLIs.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     args = build_parser().parse_args(argv)
     _, compute, render = COMMANDS[args.command]
     try:

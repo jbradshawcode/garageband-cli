@@ -32,7 +32,7 @@ def iter_chunks(data: bytes) -> Iterator[Chunk]:
         chunk_id, sub_id, index = struct.unpack_from("<III", data, offset + 0x0a)
         (size,) = struct.unpack_from("<Q", data, offset + 0x1c)
         start = offset + CHUNK_HEADER_SIZE
-        if not tag.isalnum() or start + size > len(data):
+        if not (tag.isascii() and tag.isalnum()) or start + size > len(data):
             raise ProjectError(f"ProjectData chunk at {offset:#x} is malformed")
         yield Chunk(offset, tag, chunk_id, sub_id, index, data[start:start + size])
         offset = start + size
