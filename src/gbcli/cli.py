@@ -8,6 +8,7 @@ import sys
 from typing import Any, Callable
 
 from .project import Project, ProjectError, info
+from .tracks import tracks
 
 
 def _print_info(d: dict[str, Any]) -> None:
@@ -35,8 +36,16 @@ def _print_info(d: dict[str, Any]) -> None:
                 print(f"  {f}")
 
 
+def _print_tracks(d: dict[str, Any]) -> None:
+    if not d["tracks"]:
+        print("No tracks.")
+    for t in d["tracks"]:
+        print(f"{t['number']:>3}  {t['name'] or '?'}")
+
+
 COMMANDS: dict[str, tuple[str, Callable[[Project], Any], Callable[[Any], None]]] = {
     "info": ("Song metadata: tempo, key, signature, media files", info, _print_info),
+    "tracks": ("Tracks in display order", tracks, _print_tracks),
 }
 
 
@@ -62,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
     except ProjectError as e:
         print(f"gb: {e}", file=sys.stderr)
         return 1
+    for gap in result.get("gaps", []):
+        print(f"gb: gap: {gap}", file=sys.stderr)
     if args.json:
         json.dump(result, sys.stdout, indent=2, default=str)
         print()
