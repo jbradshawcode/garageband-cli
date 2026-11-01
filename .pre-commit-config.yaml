@@ -1,4 +1,4 @@
-# Dev-only hooks; setup is in CLAUDE.md. Fixture files under tests/fixtures/ are left byte-exact.
+# Dev-only hooks; setup is in CLAUDE.md. Content hooks skip tests/fixtures/: fixtures stay byte-exact and may be deliberately malformed.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.3
@@ -7,7 +7,6 @@ repos:
         args: [--fix]
         exclude: &fixtures '(?i)^tests/fixtures/'
       - id: ruff-format
-        exclude_types: [markdown]
         exclude: *fixtures
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

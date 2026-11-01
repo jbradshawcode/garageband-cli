@@ -16,8 +16,8 @@ gb = "gbcli.cli:main"
 where = ["src"]
 
 [tool.ruff]
-# Fixtures stay byte-exact.
-extend-exclude = ["tests/fixtures"]
+# Fixtures stay byte-exact; Markdown code blocks are left as written.
+extend-exclude = ["tests/fixtures", "*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
