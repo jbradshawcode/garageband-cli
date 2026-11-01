@@ -15,7 +15,9 @@ repos:
       - id: end-of-file-fixer
         exclude: *fixtures
       - id: check-json
+        exclude: *fixtures
       - id: check-toml
+        exclude: *fixtures
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=500]
@@ -30,5 +32,7 @@ repos:
         name: no GarageBand projects or audio outside tests/fixtures/
         entry: GarageBand projects and audio stay out of the repo; test projects go under tests/fixtures/
         language: fail
+        types: []
+        types_or: [file, symlink]
         files: '(?i)(\.band/|\.(aif|aiff|aifc|wav|mp3|m4a|m4p|m4r|mp4|aac|caf|flac|ogg|opus|sdir)$)'
         exclude: *fixtures
