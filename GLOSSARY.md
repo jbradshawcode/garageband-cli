@@ -13,4 +13,11 @@ _Avoid_: variant, version
 **Chunk**: one record in ProjectData: a 36-byte header (reversed four-letter tag, payload size) followed by its payload. ProjectData is a flat sequence of chunks.
 _Avoid_: block, record, atom
 
-**Plugin slot**: a chunk (tag `UCuA`) holding one entry in a channel strip: a patch name, an instrument, or an effect plugin's saved state.
+**Plugin slot**: a chunk (tag `AuCU`) holding one entry in a channel strip: a patch name, an instrument, or an effect plugin's saved state.
+
+**Track**: one row in GarageBand's track list, in display order. Excludes the Master Track.
+
+**Environment object**: a chunk (tag `Envi`) for one named mixer object: a track's channel, a bus, an aux return, Master, Click. Tracks get their names from these.
+_Avoid_: channel (until the track-to-channel-strip link is decoded)
+
+**Gap**: anything `gb` gets wrong or can't show, found while using it. Reported on stderr as `gb: gap: ...` and filed as a GitHub issue labelled `gap`.

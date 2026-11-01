@@ -15,6 +15,7 @@ from pathlib import Path
 
 from gbcli.cli import COMMANDS, main
 from gbcli.project import Project, info
+from gbcli.tracks import tracks
 
 DEFAULT_DIRS = "~/Documents/Songs/GarageBand:~/Music/GarageBand"
 
@@ -49,6 +50,14 @@ class RealProjects(unittest.TestCase):
                 self.assertRegex(d["time_signature"], r"^\d+/\d+$")
                 self.assertTrue(d["key"])
                 self.assertTrue(d["saved_with"].startswith("GarageBand"))
+
+    def test_tracks_match_metadata_count_and_all_have_names(self):
+        for path in PROJECTS:
+            with self.subTest(project=path.name):
+                project = Project.open(path)
+                d = tracks(project)
+                self.assertEqual(len(d["tracks"]), project.metadata()["NumberOfTracks"])
+                self.assertEqual(d["gaps"], [])
 
     def test_every_command_leaves_bundle_untouched(self):
         bundle = min(PROJECTS, key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()))
