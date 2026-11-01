@@ -1,4 +1,4 @@
-# Dev-only: `uv tool install pre-commit && pre-commit install`. No CI yet (#10): run the tests yourself.
+# Dev-only hooks; setup is in CLAUDE.md. Fixture files under tests/fixtures/ are left byte-exact.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.3
@@ -11,19 +11,19 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: ^tests/fixtures/
+        exclude: &fixtures '(?i)^tests/fixtures/'
       - id: end-of-file-fixer
-        exclude: ^tests/fixtures/
+        exclude: *fixtures
       - id: check-json
       - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=500]
-        exclude: ^tests/fixtures/
+        exclude: *fixtures
       - id: check-added-large-files
         name: check for large test fixtures
         args: [--maxkb=2000]
-        files: ^tests/fixtures/
+        files: *fixtures
   - repo: local
     hooks:
       - id: no-projects-or-audio
@@ -31,4 +31,4 @@ repos:
         entry: GarageBand projects and audio stay out of the repo; test projects go under tests/fixtures/
         language: fail
         files: '(?i)(\.band/|\.(aif|aiff|aifc|wav|mp3|m4a|m4p|m4r|mp4|aac|caf|flac|ogg|opus|sdir)$)'
-        exclude: '(?i)^tests/fixtures/'
+        exclude: *fixtures

@@ -15,6 +15,10 @@ gb = "gbcli.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.ruff]
+# Fixtures stay byte-exact.
+extend-exclude = ["tests/fixtures"]
+
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
 # ruff format owns line length; long strings it cannot wrap are allowed.
