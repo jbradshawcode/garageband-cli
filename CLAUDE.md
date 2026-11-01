@@ -1,0 +1,16 @@
+# gb: GarageBand project inspector
+
+Read-only CLI for `.band` projects. Python 3.9+, standard library only.
+
+- Test: `PYTHONPATH=src python3 -m unittest discover -s tests`. Tests run against the real projects on this Mac (`~/Documents/Songs/GarageBand`, `~/Music/GarageBand`).
+- Read-only is the product's core promise: every file access goes through `project._read_bytes`, which opens in `rb` mode. The bundle-fingerprint test enforces this for every command in `cli.COMMANDS`.
+- Before touching `ProjectData` parsing, read `docs/format.md`. Record every confirmed or overturned format finding there.
+
+## Gap loop
+
+A **gap** is anything `gb` gets wrong or can't show while we use it: a crash, wrong output, an unrecognised chunk or plugin, an unnamed parameter. Each gap goes through the loop:
+
+1. File it: `gh issue create --label gap` with the command run, the project, expected vs actual output, and any bytes or offsets involved.
+2. If the fix needs ground truth from the user in GarageBand (changing knobs and saving a copy), add the `needs-ground-truth` label, tell the user what session it needs, and stop there.
+3. Otherwise start a background Agent with `isolation: "worktree"`, giving it the issue number and this brief: read the issue and `docs/format.md`; fix on branch `fix/<issue>-<slug>`; tests pass; push; `gh pr create` with `Closes #<issue>` in the body; report the PR URL.
+4. When the agent reports, post the PR link to the user. The user reviews and merges.
