@@ -26,9 +26,7 @@ def tracks(project: Project) -> dict[str, Any]:
     entries: list[tuple[int, int, int]] = []  # (index, type, envi object id)
     for c in iter_chunks(project.project_data()):
         if c.tag == "Envi":
-            name = _envi_name(c.payload)
-            if name is not None or c.id not in names:
-                names[c.id] = name
+            names[c.id] = _envi_name(c.payload)
         elif c.tag == "Trak" and c.id == TRACK_LIST_ID and len(c.payload) >= 12:
             (obj,) = struct.unpack_from("<I", c.payload, 8)
             entries.append((c.index, c.payload[0], obj))

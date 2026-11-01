@@ -29,9 +29,12 @@ def _read_bytes(path: Path) -> bytes:
 def _read_plist(path: Path) -> dict[str, Any]:
     data = _read_bytes(path)
     try:
-        return plistlib.loads(data)
+        plist = plistlib.loads(data)
     except Exception as e:  # plistlib raises several unrelated types on bad input
         raise ProjectError(f"unreadable {path.name}: {e}") from None
+    if not isinstance(plist, dict):
+        raise ProjectError(f"unreadable {path.name}: not a dictionary")
+    return plist
 
 
 @dataclass(frozen=True)

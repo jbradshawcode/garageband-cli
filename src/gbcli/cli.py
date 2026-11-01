@@ -12,12 +12,16 @@ from .project import Project, ProjectError, info
 from .tracks import tracks
 
 
+def _num(v: Any) -> str:
+    return f"{v:g}" if isinstance(v, (int, float)) else str(v)
+
+
 def _print_info(d: dict[str, Any]) -> None:
     rows = [
         ("Name", d["name"]),
         ("Path", d["path"]),
         ("Saved with", d["saved_with"]),
-        ("Tempo", f"{d['tempo_bpm']:g} BPM" if d["tempo_bpm"] is not None else None),
+        ("Tempo", f"{_num(d['tempo_bpm'])} BPM" if d["tempo_bpm"] is not None else None),
         ("Time signature", d["time_signature"]),
         ("Key", d["key"]),
         ("Sample rate", f"{d['sample_rate']} Hz" if d["sample_rate"] else None),
@@ -69,12 +73,12 @@ def main(argv: list[str] | None = None) -> int:
     _, compute, render = COMMANDS[args.command]
     try:
         result = compute(Project.open(args.project, args.alt))
-    except ProjectError as e:
+    except (ProjectError, OSError) as e:
         print(f"gb: {e}", file=sys.stderr)
         return 1
-    for gap in result.get("gaps", []):
-        print(f"gb: gap: {gap}", file=sys.stderr)
     try:
+        for gap in result.get("gaps", []):
+            print(f"gb: gap: {gap}", file=sys.stderr)
         if args.json:
             json.dump(result, sys.stdout, indent=2, default=str)
             print()

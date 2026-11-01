@@ -42,8 +42,9 @@ def bundle_fingerprint(bundle: Path) -> str:
 PROJECTS = real_projects()
 
 
-def smallest_project() -> Path:
-    return min(PROJECTS, key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()))
+SMALLEST = min(
+    PROJECTS, key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()), default=None
+)
 
 
 @unittest.skipUnless(PROJECTS, "no GarageBand projects found")
@@ -66,7 +67,7 @@ class RealProjects(unittest.TestCase):
                 self.assertEqual(d["gaps"], [])
 
     def test_every_command_leaves_bundle_untouched(self):
-        bundle = smallest_project()
+        bundle = SMALLEST
         before = bundle_fingerprint(bundle)
         for command in COMMANDS:
             for extra in ([], ["--json"]):
@@ -78,20 +79,18 @@ class RealProjects(unittest.TestCase):
         alt = Path("Alternatives/000")
         cases = [
             ("tracks", alt / "ProjectData", lambda f: f.unlink()),
-            ("tracks", alt / "ProjectData", lambda f: f.chmod(0)),
+            *([] if os.geteuid() == 0 else [("tracks", alt / "ProjectData", lambda f: f.chmod(0))]),
             ("info", alt / "MetaData.plist", lambda f: f.write_bytes(b"<?xml version='1.0'?><plist><dict><key>")),
         ]
         for command, rel, breakit in cases:
             with self.subTest(command=command, file=str(rel)), tempfile.TemporaryDirectory() as tmp:
                 copy = Path(tmp) / "p.band"
-                shutil.copytree(smallest_project(), copy, ignore=shutil.ignore_patterns("Media"))
+                shutil.copytree(SMALLEST, copy, ignore=shutil.ignore_patterns("Media"))
                 breakit(copy / rel)
                 err = io.StringIO()
                 with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(main([command, str(copy)]), 1)
                 self.assertRegex(err.getvalue(), r"^gb: ")
-                if (copy / rel).exists():
-                    (copy / rel).chmod(0o644)
 
 
 if __name__ == "__main__":
