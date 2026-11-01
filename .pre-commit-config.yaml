@@ -21,6 +21,7 @@ repos:
       - id: check-toml
         exclude: *fixtures
       - id: check-merge-conflict
+        exclude: *fixtures
       - id: check-added-large-files
         args: [--maxkb=500]
         exclude: *fixtures
