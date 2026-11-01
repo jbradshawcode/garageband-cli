@@ -17,16 +17,20 @@ class ProjectError(Exception):
 
 
 def _read_bytes(path: Path) -> bytes:
-    with open(path, "rb") as f:
-        return f.read()
+    try:
+        with open(path, "rb") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise ProjectError(f"missing {path.name} in project") from None
+    except OSError as e:
+        raise ProjectError(f"cannot read {path.name}: {e.strerror}") from None
 
 
 def _read_plist(path: Path) -> dict[str, Any]:
+    data = _read_bytes(path)
     try:
-        return plistlib.loads(_read_bytes(path))
-    except FileNotFoundError:
-        raise ProjectError(f"missing {path.name} in project") from None
-    except plistlib.InvalidFileException as e:
+        return plistlib.loads(data)
+    except Exception as e:  # plistlib raises several unrelated types on bad input
         raise ProjectError(f"unreadable {path.name}: {e}") from None
 
 

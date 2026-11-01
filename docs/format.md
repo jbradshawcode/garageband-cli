@@ -12,7 +12,7 @@ X.band/
   Media/Audio Files/, Media/Impulse Responses/, ...
 ```
 
-MetaData keys vary by GarageBand version (`AlchemyFiles`, `VideoFiles`, `QuicksamplerFiles` are sometimes absent): read every key with a default. `NumberOfTracks` does not match the count of `Trak` chunks (3 vs 17 in one project); treat it as unreliable.
+MetaData keys vary by GarageBand version (`AlchemyFiles`, `VideoFiles`, `QuicksamplerFiles` are sometimes absent): read every key with a default. `NumberOfTracks` equals the number of visible tracks (see Tracks below); it does not count `Trak` chunks, which include other lists.
 _Verified: all 32 local projects, GarageBand 10.1.2 to 10.4.12._
 
 ## ProjectData container

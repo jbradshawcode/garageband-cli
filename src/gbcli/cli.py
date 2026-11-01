@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from typing import Any, Callable
 
@@ -73,11 +74,15 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     for gap in result.get("gaps", []):
         print(f"gb: gap: {gap}", file=sys.stderr)
-    if args.json:
-        json.dump(result, sys.stdout, indent=2, default=str)
-        print()
-    else:
-        render(result)
+    try:
+        if args.json:
+            json.dump(result, sys.stdout, indent=2, default=str)
+            print()
+        else:
+            render(result)
+        sys.stdout.flush()
+    except BrokenPipeError:  # e.g. piped into `head`; exit quietly
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
     return 0
 
 

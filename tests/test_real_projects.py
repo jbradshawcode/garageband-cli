@@ -10,6 +10,8 @@ import contextlib
 import hashlib
 import io
 import os
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -29,7 +31,7 @@ def real_projects() -> list[Path]:
 
 def bundle_fingerprint(bundle: Path) -> str:
     h = hashlib.sha256()
-    for f in sorted(bundle.rglob("*")):
+    for f in [bundle, *sorted(bundle.rglob("*"))]:
         st = f.lstat()
         h.update(f"{f.relative_to(bundle)}|{st.st_size}|{st.st_mtime_ns}".encode())
         if f.is_file():
@@ -38,6 +40,10 @@ def bundle_fingerprint(bundle: Path) -> str:
 
 
 PROJECTS = real_projects()
+
+
+def smallest_project() -> Path:
+    return min(PROJECTS, key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()))
 
 
 @unittest.skipUnless(PROJECTS, "no GarageBand projects found")
@@ -60,13 +66,32 @@ class RealProjects(unittest.TestCase):
                 self.assertEqual(d["gaps"], [])
 
     def test_every_command_leaves_bundle_untouched(self):
-        bundle = min(PROJECTS, key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()))
+        bundle = smallest_project()
         before = bundle_fingerprint(bundle)
         for command in COMMANDS:
             for extra in ([], ["--json"]):
                 with contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(main([command, str(bundle), *extra]), 0)
         self.assertEqual(bundle_fingerprint(bundle), before)
+
+    def test_broken_project_files_give_gb_error_not_traceback(self):
+        alt = Path("Alternatives/000")
+        cases = [
+            ("tracks", alt / "ProjectData", lambda f: f.unlink()),
+            ("tracks", alt / "ProjectData", lambda f: f.chmod(0)),
+            ("info", alt / "MetaData.plist", lambda f: f.write_bytes(b"<?xml version='1.0'?><plist><dict><key>")),
+        ]
+        for command, rel, breakit in cases:
+            with self.subTest(command=command, file=str(rel)), tempfile.TemporaryDirectory() as tmp:
+                copy = Path(tmp) / "p.band"
+                shutil.copytree(smallest_project(), copy, ignore=shutil.ignore_patterns("Media"))
+                breakit(copy / rel)
+                err = io.StringIO()
+                with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(main([command, str(copy)]), 1)
+                self.assertRegex(err.getvalue(), r"^gb: ")
+                if (copy / rel).exists():
+                    (copy / rel).chmod(0o644)
 
 
 if __name__ == "__main__":
