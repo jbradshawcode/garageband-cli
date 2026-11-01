@@ -15,3 +15,7 @@ A **gap** is anything `gb` gets wrong or can't show while we use it: a crash, wr
 2. If the fix needs ground truth from the user in GarageBand (changing knobs and saving a copy), add the `needs-ground-truth` label, tell the user what session it needs, and stop there.
 3. Otherwise start a background Agent with `isolation: "worktree"`, giving it the issue number and this brief: read the issue and `docs/format.md`; fix on branch `fix/<issue>-<slug>`; tests pass; push; `gh pr create` with `Closes #<issue>` in the body; report the PR URL.
 4. When the agent reports, review the PR: tests pass, and output checked against real projects. Then merge it (squash) and post the PR link to the user. The user has authorised merging without asking.
+
+## Ready to merge
+
+A PR is **ready** only after `/code-review` has run on it and every finding is either fixed or answered on the PR with the reason it stands, repeating until a review comes back with no findings. Tests must pass. Then squash-merge it without asking; this applies to the gap loop's fix agents too.
