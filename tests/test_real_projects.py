@@ -60,7 +60,10 @@ class RealProjects(unittest.TestCase):
                 self.assertEqual(d["gaps"], [])
 
     def test_every_command_leaves_bundle_untouched(self):
-        bundle = min(PROJECTS, key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()))
+        bundle = min(
+            PROJECTS,
+            key=lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file()),
+        )
         before = bundle_fingerprint(bundle)
         for command in COMMANDS:
             for extra in ([], ["--json"]):

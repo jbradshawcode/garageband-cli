@@ -1,0 +1,28 @@
+# Dev-only: `uv tool install pre-commit && pre-commit install`. Tests run in CI, not here.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+        exclude: ^tests/fixtures/
+  - repo: local
+    hooks:
+      - id: no-projects-or-audio
+        name: no GarageBand projects or audio outside tests/fixtures/
+        entry: GarageBand projects and audio stay out of the repo; test projects go under tests/fixtures/
+        language: fail
+        files: '(\.band/|\.(aif|aiff|wav|mp3|m4a|caf)$)'
+        exclude: ^tests/fixtures/

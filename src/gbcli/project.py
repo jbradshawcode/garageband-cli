@@ -36,16 +36,14 @@ class Project:
     alternative: int = 0
 
     @classmethod
-    def open(cls, path: str | Path, alternative: int = 0) -> "Project":
+    def open(cls, path: str | Path, alternative: int = 0) -> Project:
         p = Path(path).expanduser().resolve()
         if not (p / "Alternatives").is_dir():
             raise ProjectError(f"not a GarageBand project: {p}")
         project = cls(p, alternative)
         if not project.alternative_dir.is_dir():
             available = ", ".join(str(a) for a in project.alternatives()) or "none"
-            raise ProjectError(
-                f"no alternative {alternative} (available: {available})"
-            )
+            raise ProjectError(f"no alternative {alternative} (available: {available})")
         return project
 
     @property
@@ -74,18 +72,14 @@ def info(project: Project) -> dict[str, Any]:
     pinfo = project.project_information()
     meta = project.metadata()
     variants = pinfo.get("VariantNames", {})
-    key = " ".join(
-        v for v in (meta.get("SongKey"), meta.get("SongGenderKey")) if v
-    )
+    key = " ".join(v for v in (meta.get("SongKey"), meta.get("SongGenderKey")) if v)
     num, den = meta.get("SongSignatureNumerator"), meta.get("SongSignatureDenominator")
     return {
         "name": variants.get(str(project.alternative), project.path.stem),
         "path": str(project.path),
         "saved_with": pinfo.get("LastSavedFrom"),
         "alternative": project.alternative,
-        "alternatives": {
-            a: variants.get(str(a)) for a in project.alternatives()
-        },
+        "alternatives": {a: variants.get(str(a)) for a in project.alternatives()},
         "tempo_bpm": meta.get("BeatsPerMinute"),
         "time_signature": f"{num}/{den}" if num and den else None,
         "key": key or None,
