@@ -1,5 +1,6 @@
 # GarageBand projects and audio stay out of the repo (also enforced by pre-commit).
-*.band/
+*.band
+ProjectData
 *.aif
 *.aiff
 *.aifc

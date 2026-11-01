@@ -5,13 +5,16 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
+        exclude: &fixtures '(?i)^tests/fixtures/'
       - id: ruff-format
+        types_or: [python, pyi]
+        exclude: *fixtures
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: &fixtures '(?i)^tests/fixtures/'
+        exclude: *fixtures
       - id: end-of-file-fixer
         exclude: *fixtures
       - id: check-json
@@ -23,6 +26,7 @@ repos:
         args: [--maxkb=500]
         exclude: *fixtures
       - id: check-added-large-files
+        alias: check-fixture-size
         name: check for large test fixtures
         args: [--maxkb=2000]
         files: *fixtures
@@ -34,5 +38,11 @@ repos:
         language: fail
         types: []
         types_or: [file, symlink]
-        files: '(?i)(\.band/|\.(aif|aiff|aifc|wav|mp3|m4a|m4p|m4r|mp4|aac|caf|flac|ogg|opus|sdir)$)'
+        files: '(?i)(\.band(/|$)|(^|/)ProjectData$|\.(aif|aiff|aifc|wav|mp3|m4a|m4p|m4r|mp4|aac|caf|flac|ogg|opus|sdir)$)'
         exclude: *fixtures
+      - id: no-fixture-symlinks
+        name: no symlinks in tests/fixtures/
+        entry: fixtures must be real copies, not links to projects on this Mac
+        language: fail
+        types: [symlink]
+        files: *fixtures
