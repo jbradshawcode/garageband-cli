@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
+import signal
 import sys
 from typing import Any, Callable
 
@@ -69,24 +69,22 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Die quietly when the reader goes away (e.g. `gb ... | head`), like other CLIs.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     args = build_parser().parse_args(argv)
     _, compute, render = COMMANDS[args.command]
     try:
         result = compute(Project.open(args.project, args.alt))
-    except (ProjectError, OSError) as e:
+    except ProjectError as e:
         print(f"gb: {e}", file=sys.stderr)
         return 1
-    try:
-        for gap in result.get("gaps", []):
-            print(f"gb: gap: {gap}", file=sys.stderr)
-        if args.json:
-            json.dump(result, sys.stdout, indent=2, default=str)
-            print()
-        else:
-            render(result)
-        sys.stdout.flush()
-    except BrokenPipeError:  # e.g. piped into `head`; exit quietly
-        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+    for gap in result.get("gaps", []):
+        print(f"gb: gap: {gap}", file=sys.stderr)
+    if args.json:
+        json.dump(result, sys.stdout, indent=2, default=str)
+        print()
+    else:
+        render(result)
     return 0
 
 

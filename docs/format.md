@@ -38,6 +38,7 @@ Tags seen (reversed to read order): `Song`, `MSeq`, `EvSq`, `TxSt`, `Styl`, `Tra
 - `Trak` payload: byte 0 = entry type (`3` = Master Track, excluded from the track list; `1` and `10` seen on ordinary tracks, meaning unknown); byte 2 = flags of unknown meaning (`0x14`, `0x15`, `0x1c`, `0x1d` seen); u32 at offset 8 = `Envi` object ID.
 - Zero-size `Trak` chunks are common; skip them.
 - Several tracks may share a name (GarageBand names tracks after their patch).
+- `Envi` object IDs are unique within a project (checked across all 32 local projects).
 
 _Verified: non-master entries in list `0x04` equal `NumberOfTracks` and all resolve to names, in all 32 local projects. Order and names confirmed against a GarageBand screenshot of OP1.band (GarageBand 10.4.12), including the user's own spelling "PIano Chords"._
 
