@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "skill-utils": {
+      "source": {
+        "source": "github",
+        "repo": "jbradshawcode/skill-utils"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "skill-utils@skill-utils": true
+  }
+}
