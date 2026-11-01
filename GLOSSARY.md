@@ -22,5 +22,5 @@ _Avoid_: channel (until the track-to-channel-strip link is decoded)
 
 **Gap**: anything `gb` gets wrong or can't show, found while using it. Reported on stderr as `gb: gap: ...` and filed as a GitHub issue labelled `gap`.
 
-**Ready**: a PR that has passed the ready checklist in CLAUDE.md and may be merged without asking.
+**Ready**: a PR that meets every merge criterion; until then it is a draft.
 _Avoid_: done, mergeable, approved
