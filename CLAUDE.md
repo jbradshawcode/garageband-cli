@@ -14,16 +14,19 @@ A **gap** is anything `gb` gets wrong or can't show while we use it: a crash, wr
 
 1. File it: `gh issue create --label gap` with the command run, the project, expected vs actual output, and any bytes or offsets involved.
 2. If the fix needs ground truth from the user in GarageBand (changing knobs and saving a copy), add the `needs-ground-truth` label, tell the user what session it needs, and stop there.
-3. Otherwise start a background Agent with `isolation: "worktree"`, giving it the issue number and this brief: read the issue and `docs/format.md`; fix on branch `fix/<issue>-<slug>`; open a draft PR with `Closes #<issue>` once the test suite passes; work through the ready checklist below; report the PR URL and the checklist outcome.
-4. When the agent reports, merge per the ready checklist.
+3. Otherwise start a background Agent with `isolation: "worktree"`, giving it the issue number and this brief: read the issue and `docs/format.md`; fix on branch `fix/<issue>-<slug>`; when the test suite passes, push and open a draft PR with `Closes #<issue>`; work through the ready checklist below, committing and pushing after every fix; report the PR URL, your worktree path, the checklist outcome, every review finding you answered instead of fixing, and anything that needs the user.
+4. When the agent reports:
+   - If it needs the user (ground truth, review cap), tell the user and leave the PR as a draft.
+   - Otherwise run the test suite yourself inside the agent's worktree. If it fails, `gh pr ready --undo <n>` and hand the failure back to an agent.
+   - If it passes, `git worktree remove <path>`, then merge as below.
 
 ## Ready to merge
 
-Every PR opens as a draft (`gh pr create --draft`). It becomes **ready** (`gh pr ready <n>`) when the whole checklist holds on its final pushed commit. Any push restarts the checklist from item 1.
+Every PR opens as a draft (`gh pr create --draft`) and becomes **ready** (`gh pr ready <n>`) when this checklist holds on its final pushed commit:
 
-1. The full test suite passes on the PR branch (`gh pr checkout <n>`, then the test command above).
-2. The PR description carries the `skill-utils:test-writing` verdict line for every added or changed test, copied from the chat.
-3. Changed output was checked against real projects. New `ProjectData` decoding is confirmed against ground truth the user supplied (a screenshot, a diff session). If it needs fresh ground truth, label the PR `needs-ground-truth`, leave it as a draft, and tell the user. Never open or drive GarageBand yourself: it can autosave the user's projects.
-4. `/code-review high <n>` has run. Fix each finding, or answer it on the PR with the reason it stands. Repeat until a run raises nothing you would fix. After 3 rounds with fixable findings still open, the PR stays a draft and waits for the user.
+1. The full test suite passes. Re-check after every push.
+2. The PR description carries the `skill-utils:test-writing` verdict line for every added test, copied from the chat.
+3. Changed output was checked against real projects; re-check after every push. New `ProjectData` decoding is confirmed against ground truth the user supplied (a screenshot, a diff session). If it needs fresh ground truth, label the PR `needs-ground-truth`, leave it as a draft and report it. Never open or drive GarageBand yourself: it can autosave the user's projects.
+4. `/code-review high <n>` has run. Fix each finding, or answer it on the PR with the reason it stands, and push. Repeat until a run raises nothing you would fix, at most 3 runs per PR in total. If fixable findings remain after the third, the PR stays a draft for the user.
 
-Whoever merges re-runs item 1 themselves; a report alone is not enough. Then squash-merge (`gh pr merge --squash --delete-branch`) without asking, as the user has authorised, and post the PR link to the user.
+To merge a ready PR: squash-merge (`gh pr merge --squash --delete-branch`) without asking, as the user has authorised. Post the PR link to the user, listing any findings that were answered instead of fixed.
