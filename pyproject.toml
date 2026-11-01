@@ -15,9 +15,6 @@ gb = "gbcli.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.ruff]
-target-version = "py39"
-
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
 # ruff format owns line length; long strings it cannot wrap are allowed.
