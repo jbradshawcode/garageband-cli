@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.x"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      # Fixture tests run here; the sweep skips (no GarageBand on Linux).
+      - run: python -m unittest discover -s tests -v
+        env:
+          PYTHONPATH: src
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+      # The hooks pin ruff, and catch commits made without hooks installed.
+      - run: pip install pre-commit
+      - run: pre-commit run --all-files --show-diff-on-failure

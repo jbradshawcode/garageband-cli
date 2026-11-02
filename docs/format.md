@@ -12,6 +12,9 @@ X.band/
   Media/Audio Files/, Media/Impulse Responses/, ...
 ```
 
+A lowercase `projectData` file (about 169 KB, XML header) also sits at the bundle root. In the two test projects it is byte-identical to the one in each of GarageBand 10.4.12's six NewProject templates, so it looks like a template leftover rather than song data; `gb` ignores it. All 31 local projects have one.
+_Verified: `cmp` against the six templates; presence checked in all 31 local projects._
+
 MetaData keys vary by GarageBand version (`AlchemyFiles`, `VideoFiles`, `QuicksamplerFiles` are sometimes absent): read every key with a default. `NumberOfTracks` does not match the count of `Trak` chunks (3 vs 17 in one project); treat it as unreliable.
 _Verified: all 32 local projects, GarageBand 10.1.2 to 10.4.12._
 
