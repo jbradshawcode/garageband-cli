@@ -14,3 +14,12 @@ gb = "gbcli.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+# Fixtures stay byte-exact; Markdown code blocks are left as written.
+extend-exclude = ["tests/fixtures", "*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# ruff format owns line length; long strings it cannot wrap are allowed.
+ignore = ["E501"]

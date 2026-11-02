@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import struct
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Iterator
 
 from .project import ProjectError
 
@@ -28,13 +28,13 @@ def iter_chunks(data: bytes) -> Iterator[Chunk]:
         raise ProjectError("ProjectData has an unknown file header")
     offset = FILE_HEADER_SIZE
     while offset + CHUNK_HEADER_SIZE <= len(data):
-        tag = data[offset:offset + 4][::-1].decode("latin-1")
-        chunk_id, sub_id, index = struct.unpack_from("<III", data, offset + 0x0a)
-        (size,) = struct.unpack_from("<Q", data, offset + 0x1c)
+        tag = data[offset : offset + 4][::-1].decode("latin-1")
+        chunk_id, sub_id, index = struct.unpack_from("<III", data, offset + 0x0A)
+        (size,) = struct.unpack_from("<Q", data, offset + 0x1C)
         start = offset + CHUNK_HEADER_SIZE
         if not tag.isalnum() or start + size > len(data):
             raise ProjectError(f"ProjectData chunk at {offset:#x} is malformed")
-        yield Chunk(offset, tag, chunk_id, sub_id, index, data[start:start + size])
+        yield Chunk(offset, tag, chunk_id, sub_id, index, data[start : start + size])
         offset = start + size
     if offset != len(data):
         raise ProjectError(f"ProjectData has {len(data) - offset} trailing bytes")

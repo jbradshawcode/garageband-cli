@@ -17,7 +17,7 @@ def _envi_name(payload: bytes) -> str | None:
     if len(payload) < ENVI_NAME_OFFSET + 2:
         return None
     (n,) = struct.unpack_from("<H", payload, ENVI_NAME_OFFSET)
-    raw = payload[ENVI_NAME_OFFSET + 2:ENVI_NAME_OFFSET + 2 + n]
+    raw = payload[ENVI_NAME_OFFSET + 2 : ENVI_NAME_OFFSET + 2 + n]
     return raw.decode("utf-8", "replace") if n and len(raw) == n else None
 
 
@@ -38,6 +38,8 @@ def tracks(project: Project) -> dict[str, Any]:
             continue
         name = names.get(obj)
         if name is None:
-            gaps.append(f"track {len(result) + 1}: no name found (Envi object {obj:#x})")
+            gaps.append(
+                f"track {len(result) + 1}: no name found (Envi object {obj:#x})"
+            )
         result.append({"number": len(result) + 1, "name": name, "object_id": obj})
     return {"tracks": result, "gaps": gaps}

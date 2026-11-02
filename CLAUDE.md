@@ -2,6 +2,7 @@
 
 Read-only CLI for `.band` projects. Python 3.9+, standard library only.
 
+- Hooks: `uv tool install pre-commit && pre-commit install` (dev-only: ruff, hygiene, a block on projects and audio outside `tests/fixtures/`). Run ruff through `pre-commit run --all-files`, which pins its version (plain `pre-commit run` checks only staged files).
 - Test: `PYTHONPATH=src python3 -m unittest discover -s tests`. Tests run against the real projects on this Mac (`~/Documents/Songs/GarageBand`, `~/Music/GarageBand`).
 - Apple's system Python keeps bytecode in `~/Library/Caches/com.apple.python/<project path>/`, not `__pycache__`. An edit that keeps file size and lands in the same second as the last compile runs stale code: after quick revert-style edits, delete that folder.
 - Read-only is the product's core promise: every file access goes through `project._read_bytes`, which opens in `rb` mode. The bundle-fingerprint test enforces this for every command in `cli.COMMANDS`.

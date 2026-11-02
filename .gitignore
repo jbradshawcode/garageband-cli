@@ -1,3 +1,24 @@
+# GarageBand projects and audio stay out of the repo (also enforced by pre-commit).
+*.band
+ProjectData
+*.aif
+*.aiff
+*.aifc
+*.wav
+*.mp3
+*.m4a
+*.m4p
+*.m4r
+*.mp4
+*.aac
+*.caf
+*.flac
+*.ogg
+*.opus
+*.sdir
+!tests/fixtures/**
+
+# After the fixtures exception, so it doesn't un-ignore these.
 __pycache__/
 *.egg-info/
 .venv/

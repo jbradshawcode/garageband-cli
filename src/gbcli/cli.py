@@ -57,8 +57,13 @@ def build_parser() -> argparse.ArgumentParser:
     for name, (help_text, _, _) in COMMANDS.items():
         p = sub.add_parser(name, help=help_text, description=help_text)
         p.add_argument("project", help="path to a .band project")
-        p.add_argument("--alt", type=int, default=0, metavar="N",
-                       help="project alternative to read (default 0)")
+        p.add_argument(
+            "--alt",
+            type=int,
+            default=0,
+            metavar="N",
+            help="project alternative to read (default 0)",
+        )
         p.add_argument("--json", action="store_true", help="output JSON")
     return parser
 
