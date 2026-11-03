@@ -42,7 +42,7 @@ Tags seen (reversed to read order): `Song`, `MSeq`, `EvSq`, `TxSt`, `Styl`, `Tra
 - Zero-size `Trak` chunks are common; skip them.
 - Several tracks may share a name (GarageBand names tracks after their patch).
 
-_Verified: non-master entries in list `0x04` equal `NumberOfTracks` and all resolve to names, in all 32 local projects. Order and names confirmed against a GarageBand screenshot of OP1.band (GarageBand 10.4.12), including the user's own spelling "PIano Chords"._
+_Verified: non-master entries in list `0x04` equal `NumberOfTracks` and all resolve to names, in all 32 local projects. Order and names confirmed against a GarageBand screenshot of a personal project (GarageBand 10.4.12), including a user-typed track name with unusual capitalisation, spelled exactly as in the project._
 
 ## Plugin slots (`AuCU`)
 
